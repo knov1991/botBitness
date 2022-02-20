@@ -1,0 +1,1 @@
+valorBase = float(campoValorInicial.get())
