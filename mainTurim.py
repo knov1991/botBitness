@@ -26,6 +26,8 @@ valorBase = 1
 multiplicador = 0
 martingale = 0
 galeAtual = 0
+soros = 0
+sorosAtual = 0
 #carteira
 carteiraInicial = 0
 carteiraAntesAposta = 0
@@ -53,13 +55,15 @@ interfacePermissao = False
 ##########################################
 def impDados():
     try:
-        global valorBase, stopWin, stopLoss, velas, martingale, multiplicador, interfacePermissao
+        global valorBase, stopWin, stopLoss, velas, martingale, multiplicador, interfacePermissao, soros
         valorBase = float(campoValorInicial.get())
         stopWin = int(campoStopWin.get())
         stopLoss = int(campoStopLoss.get())
         velas = int(campoVelas.get())
         if(velas < 1):
             return
+        
+        #MARTINGALE
         #Se o checkBox Martingale estiver habilitado - pega os valores de martingale e multiplicador
         if(checkGale.get() == 1):
             #Martingale minimo = 1
@@ -77,6 +81,17 @@ def impDados():
             martingale = 0
             multiplicador = 0
 
+        #SOROS
+        #Se o checkBox Soros estiver habilitado - pega a quantidade de entradas no soros
+        if(checkSoros.get() == 1):
+            #Soros minimo = 1
+            if(int(campoSoros.get()) >= 1):
+                soros = int(campoSoros.get())
+            else:
+                return
+
+        
+
         #interface da permissao para o bot iniciar
         interfacePermissao = True
         btnIniciar.config(state="disabled")
@@ -86,20 +101,36 @@ def impDados():
         campoVelas.config(state="disabled")
         boxGale.config(state="disabled")
         campoMartingale.config(state="disabled")
+        campoSoros.config(state="disabled")
         campoMultiplicador.config(state="disabled")
         #Info - Variaveis de Uso
         Label(app,text='Valor-Inicial: '+str(valorBase),background=corFundo,foreground=corInfo,anchor=W).place(x=30,y=220,width=160,height=20)
         Label(app,text='Stop-Win: '+str(stopWin),background=corFundo,foreground=corInfo,anchor=W).place(x=30,y=240,width=160,height=20)
-        Label(app,text='Stop-Loss: '+str(stopLoss),background=corFundo,foreground=corInfo,anchor=W).place(x=30,y=260,width=160,height=20)
-        if(checkGale.get() == 1):
-            Label(app,text='Multiplicador: '+str(multiplicador),background=corFundo,foreground=corInfo,anchor=W).place(x=30,y=280,width=160,height=20)
+        Label(app,text='Stop-Loss: '+str(stopLoss),background=corFundo,foreground=corInfo,anchor=W).place(x=30,y=260,width=160,height=20)       
         #Info - Entradas/Apostas
         Label(app,text='Entrada:  $'+str(valorBase),background=corFundo,foreground=corInfo,anchor=W).place(x=190,y=220,width=160,height=20)
+        #Martingale
         if(checkGale.get() == 1):
+            Label(app,text='Multiplicador: '+str(multiplicador),background=corFundo,foreground=corInfo,anchor=W).place(x=30,y=280,width=160,height=20)
             for i in range(martingale):
                 Label(app,text='Gale -  '+str(i+1)+':'  +' $'+str(round(valorBase*(multiplicador**(i+1)), 2)),background=corFundo,foreground=corInfo,anchor=W).place(x=190,y=220+((i+1)*20),width=160,height=20)
+        #Soros
+        if(checkSoros.get() == 1):
+            Label(app,text='Mãos Soros: '+str(soros),background=corFundo,foreground=corInfo,anchor=W).place(x=30,y=280,width=160,height=20)
+            if(valorBase >= 2):
+                for i in range(soros):
+                    Label(app,text='Soros -  '+str(i+1)+':'  +' $'+str(round(valorBase**(i+2), 2)),background=corFundo,foreground=corInfo,anchor=W).place(x=190,y=220+((i+1)*20),width=160,height=20)
+            elif(valorBase < 2):
+                for i in range(soros):
+                    Label(app,text='Soros -  '+str(i+1)+':'  +' $'+str(round((valorBase*2)**(i+1), 2)),background=corFundo,foreground=corInfo,anchor=W).place(x=190,y=220+((i+1)*20),width=160,height=20)
+        
+        """ elif(sorosAtual > 0 and valorBase >= 2):
+            keyboard.write(str(round(valorBase**(sorosAtual+1), 2)))
+        elif(sorosAtual > 0 and valorBase < 2):
+            keyboard.write(str(round((valorBase*2)**sorosAtual, 2))) """
         #Alerta Iniciar Bot
-        if(martingale > 3):
+
+        if(martingale > 3 or soros > 3):
             Label(app,text='O Bot sera iniciado em 10 segundos!',background=corFundo,foreground=corAlerta,anchor=W).place(x=50,y=240+((i+1)*20),width=200,height=20)
         else:
             Label(app,text='O Bot sera iniciado em 10 segundos!',background=corFundo,foreground=corAlerta,anchor=W).place(x=50,y=320,width=200,height=20)
@@ -115,9 +146,22 @@ def ativadorMartingale():
     if (checkGale.get() == 1):
         campoMartingale.config(state="normal")
         campoMultiplicador.config(state="normal")
+        #Ativar Martingale desativa Soros
+        checkSoros.set(0)
+        campoSoros.config(state="disabled")
     else:
         campoMartingale.config(state="disabled")
         campoMultiplicador.config(state="disabled")
+
+def ativadorSoros():
+    if (checkSoros.get() == 1):
+        campoSoros.config(state="normal")
+        #Ativar Soros desativa Martingale
+        checkGale.set(0)
+        campoMartingale.config(state="disabled")
+        campoMultiplicador.config(state="disabled")
+    else:
+        campoSoros.config(state="disabled")
         
 
 #cores
@@ -165,6 +209,15 @@ campoMultiplicador=Entry(app)
 campoMultiplicador.place(x=480,y=35,width=50,height=20)
 campoMultiplicador.config(state="disabled")
 
+#Informação Soros
+checkSoros = IntVar()
+boxSoros = Checkbutton(app, text='Soros',variable=checkSoros, onvalue=1, offvalue=0, command=ativadorSoros)
+boxSoros.place(x=300,y=90,width=100,height=20)
+
+Label(app,text='Qtd.Soros',background=corFundo,foreground=corTexto,anchor=W).place(x=420,y=70,width=80,height=20)
+campoSoros=Entry(app)
+campoSoros.place(x=420,y=90,width=50,height=20)
+campoSoros.config(state="disabled")
 
 #Alerta - Uso
 Label(app,text='Nos valores com virgula 2,5 usar ponto 2.5',background=corFundo,foreground=corAlerta,anchor=W).place(x=30,y=60,width=240,height=20)
@@ -234,8 +287,14 @@ def alteraValor():
     click(1780,510) #valor da aposta 2 clicks
     click(1780,510)
     sleep(0.1)
+    #Martingale
     if(galeAtual > 0):
         keyboard.write(str(round(valorBase*(multiplicador**galeAtual), 2)))
+    #Soros
+    elif(sorosAtual > 0 and valorBase >= 2):
+        keyboard.write(str(round(valorBase**(sorosAtual+1), 2)))
+    elif(sorosAtual > 0 and valorBase < 2):
+        keyboard.write(str(round((valorBase*2)**sorosAtual, 2)))
     else:
         keyboard.write(str(valorBase))
 
@@ -344,10 +403,14 @@ sleep(2)
 ##########################################
 # inicia bot
 while True:
-    #usado para limitar a data de funcionamento do BOT
+
+    #TRAVAR O BOT APOS DATA LIMITE
     dataHoje = verificaData()
-    #Bot para de funcionar se passar do mês 2 ou do ano 2022
+    #Se passar do Mês 3 ou do Ano 2022
     if(dataHoje[1] > 3 or dataHoje[2] > 2022):
+        exit()
+    #Se passar do Dia 7 do Mês 3
+    elif(dataHoje[0] > 7 and dataHoje[1] == 3):
         exit()
 
     #verifica tempo
@@ -388,19 +451,33 @@ while True:
                 sleep(10)
                 click(1780,800)
                 sleep(1)
+                #WIN
                 if(wallet() > carteiraAntesAposta):
                     win += 1
                     ultimoLoss = 2 #nada
+                    #Martingale
                     if(martingale > 0 and galeAtual > 0):
                         galeAtual = 0
+                    #Soros
+                    if(soros > 0 and sorosAtual < soros):
+                        sorosAtual += 1
+                    elif(soros > 0 and sorosAtual == soros):
+                        sorosAtual = 0
+                        print('SUCESSO NA SEQUENCIA DE '+str(soros)+' MÕAS DE SOROS! - VOLTANDO PARA ENTRADA INICIAL!')
+                #LOSS
                 elif(wallet() < carteiraAntesAposta):
                     loss += 1
                     ultimoLoss = 1
+                    #Martingale
                     if(galeAtual < martingale):
                         galeAtual += 1
                     elif(martingale > 0 and galeAtual == martingale):
                         galeAtual = 0
-                        print('ESTOUROU MARTINGALE - RESETANDO PARA ENTRADA INICIAL')
+                        print('ESTOUROU MARTINGALE - RESETANDO PARA ENTRADA INICIAL!')
+                    #Soros
+                    if(soros > 0 and sorosAtual != 0):
+                        sorosAtual = 0
+                #FALHA
                 else:
                     falha += 1
                     ultimoLoss = 2 #nada
@@ -432,19 +509,33 @@ while True:
                 sleep(10)
                 click(1780,800)
                 sleep(1)
+                #WIN
                 if(wallet() > carteiraAntesAposta):
                     win += 1
                     ultimoLoss = 2 #nada
+                    #Martingale
                     if(martingale > 0 and galeAtual > 0):
                         galeAtual = 0
+                    #Soros
+                    if(soros > 0 and sorosAtual < soros):
+                        sorosAtual += 1
+                    elif(soros > 0 and sorosAtual == soros):
+                        sorosAtual = 0
+                        print('SUCESSO NA SEQUENCIA DE '+str(soros)+' MÕAS DE SOROS! - VOLTANDO PARA ENTRADA INICIAL!')
+                #LOSS
                 elif(wallet() < carteiraAntesAposta):
                     loss += 1
                     ultimoLoss = 0 #vermelho
+                    #Martingale
                     if(galeAtual < martingale):
                         galeAtual += 1
                     elif(martingale > 0 and galeAtual == martingale):
                         galeAtual = 0
                         print('ESTOUROU MARTINGALE - RESETANDO PARA ENTRADA INICIAL')
+                    #Soros
+                    if(soros > 0 and sorosAtual != 0):
+                        sorosAtual = 0
+                #FALHA
                 else:
                     falha += 1
                     ultimoLoss = 2 #nada
