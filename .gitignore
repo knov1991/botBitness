@@ -1,0 +1,6 @@
+#Ignorar esses arquivos
+__pycache__
+output/*
+
+#Não ignorar esses arquivos
+!output/chromedriver.exe
