@@ -10,7 +10,7 @@ chrome_options = Options()
 chrome_options.add_experimental_option("debuggerAddress", "127.0.0.1:9990")
 # selenium buscará webdriver.exe en las variables de entorno del sistema cuando se ejecute
 # Por lo general, coloque webdriver.exe en el directorio de python, de modo que no sea necesario especificarlo en el código.
-chrome_driver = r"C:\Users\marce\OneDrive\Área de Trabalho\bitness\ROBOTCRUZ\chromedriver.exe"
+chrome_driver = r"C:\Program Files\LUCAS FERREIRA\Bots\botTurimBitness\chromedriver.exe"
 driver = webdriver.Chrome(chrome_driver, chrome_options=chrome_options)
 
 
@@ -102,6 +102,7 @@ def compra():
 	if balance() != balAnterior:
 		print("Gano")
 		perdidas = 0
+		time.sleep(0.1)
 		if ultimoQuadrado == 0: #Roja
 			cCompra = False
 		if ultimoQuadrado == 1: #Verde
