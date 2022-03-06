@@ -8,13 +8,13 @@ import pyautogui
 import datetime
 
 #GOOGLE CHROME
-chrome_options = Options()
-chrome_options.add_experimental_option("debuggerAddress", "127.0.0.1:9990")
+options = Options()
+options.add_experimental_option("debuggerAddress", "127.0.0.1:9990")
 # selenium buscará webdriver.exe en las variables de entorno del sistema cuando se ejecute
 # Por lo general, coloque webdriver.exe en el directorio de python, de modo que no sea necesario especificarlo en el código.
 #chrome_driver = r"C:\Users\ygor_\OneDrive\Área de Trabalho\bitness\robot\chromedriver.exe"
-chrome_driver = r"C:\Program Files\LUCAS FERREIRA\Bots\botTurimBitness\output\chromedriver.exe"
-driver = webdriver.Chrome(chrome_driver, chrome_options=chrome_options)
+#chrome_driver = r"C:\Program Files\LUCAS FERREIRA\Bots\botTurimBitness\output\chromedriver.exe"
+driver = webdriver.Chrome(options=options)
 
 
 #Configuracion
