@@ -18,7 +18,7 @@ driver = webdriver.Chrome(options=chrome_options)
 #driver.get('https://testnet.bitness.pro/en/trade/BTCUSD')
 
 
-sleep(2)
+#sleep(2)
 
 ultimaOrdemID = ""
 
@@ -30,17 +30,24 @@ def verificaOrdemAberta():
     except:
         return False
 
-ultimaOrdemHistoricoID = driver.find_elements(By.CLASS_NAME, 'font-regular')[1].find_elements(By.CLASS_NAME, 'orderid')[0]
-ultimaOrdemHistoricoStatus = driver.find_elements(By.CLASS_NAME, 'font-regular')[1].find_elements(By.CLASS_NAME, 'status')[0]
+def verificaOrdemHistorico():
+    try:
+        ultimaOrdemHistoricoID = driver.find_elements(By.CLASS_NAME, 'font-regular')[1].find_elements(By.CLASS_NAME, 'orderid')[0]
+        ultimaOrdemHistoricoStatus = driver.find_elements(By.CLASS_NAME, 'font-regular')[1].find_elements(By.CLASS_NAME, 'status')[0]
+        sleep(0.1)
+        return ultimaOrdemHistoricoID.text, ultimaOrdemHistoricoStatus.text
+    except:
+        return False
 
-ordemAtual = verificaOrdemAberta()
+
+""" ordemAtual = verificaOrdemAberta()
 if ordemAtual != False:
     print(ordemAtual)
     ultimaOrdemID = ordemAtual
 else:
     print('Não existem ordens abertas')
-
-    print(ultimaOrdemHistoricoID.text, ultimaOrdemHistoricoStatus.text)
+ """
+print(verificaOrdemHistorico())
 
 
 """ tt = document.getElementsByClassName("font-regular");

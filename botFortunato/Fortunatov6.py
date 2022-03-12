@@ -61,7 +61,7 @@ createdCsvFile = False
 contadorDeAposta = 0
 #Gales
 contadorGale = []
-maxGales = 5
+maxGales = 9
 for i in range(maxGales):
 	contadorGale.append(0)
 
