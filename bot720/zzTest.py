@@ -1,10 +1,18 @@
-zz = [1,2,3,4,5,6,7,8,9,10]
+import os.path
+import csv
 
-for i in range(len(zz)):
-    if zz[i] % 2 == 0:
-        print(zz[i],'div 2')
-    if zz[i] % 3 == 0:
-        print(zz[i], 'div 3')
-        break
+arquivoExiste = os.path.exists('Test.csv')
 
-print('fim')
+
+
+if arquivoExiste == True:
+	with open('Test.csv', 'a', newline='\n') as csvfile:
+				fieldnames = ['Vitorias']
+				writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+				writer.writerow({'Vitorias': 1000})
+else:
+	with open('Test.csv', 'w', newline='\n') as csvfile:
+				fieldnames = ['Vitorias']
+				writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+				writer.writeheader()
+				writer.writerow({'Vitorias': 0})
