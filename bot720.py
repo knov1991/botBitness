@@ -35,7 +35,7 @@ galeAtual = 0
 win = 0
 loss = 0
 #Configurações de Aposta -- Ajuste Pessoal para funcionamento do Bot
-travaTrocaTendencia = 10
+travaTrocaTendencia = 10 #quantidade de velas
 valorGale = [1.03,3.09,7.27,16.76,38.02,82.19,172.85,360.89,733]
 maxGale = 9 #quantidade de gales + entrada inicial // ex: 8 gales + entrada inicial = 9
 contadorGales = []
@@ -221,4 +221,5 @@ def verificarTempo():
 ######   INICIAR BOT    ######
 ##############################
 sleep(3)
-main()
+#main()
+analisarTendencia()
