@@ -1,13 +1,13 @@
-from tkinter import *
-from jinja2 import Undefined
-import pyautogui
-import keyboard
-from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium import webdriver
+import pyautogui
 from time import sleep
+import keyboard
 from datetime import datetime, date
-import csv
+from jinja2 import Undefined
 import os.path
+import csv
+
 
 ##############################
 #######   VARIÁVEIS    #######
@@ -35,11 +35,11 @@ galeAtual = 0
 win = 0
 loss = 0
 #Configurações de Aposta -- Ajuste Pessoal para funcionamento do Bot
-travaTrocaTendencia = 10 #quantidade de velas
+travaTrocaTendencia = 14 #quantidade de velas
 valorGale = [1.03,3.09,7.27,16.76,38.02,82.19,172.85,360.89,733]
-maxGale = 9 #quantidade de gales + entrada inicial // ex: 8 gales + entrada inicial = 9
+maxGale = 8 #quantidade de gales // iniciando em 0 // 8 max = 012345678 total 9 entradas
 contadorGales = []
-for i in range(maxGale):
+for i in range(maxGale+1): #maxGale + entrada inicial
 	contadorGales.append(0)
 
 
@@ -54,22 +54,8 @@ driver = webdriver.Chrome(options=options)
 ##############################
 ########   FUNÇÕES    ########
 ##############################
-#Pegar dia/mes/ano
-def verificaData():
-    hoje = date.today()
-    dia = hoje.day
-    mes = hoje.month
-    ano = hoje.year
-    return [dia,mes,ano]
-
 def main():
 	while True:
-		#TRAVAR O BOT APOS DATA LIMITE
-		dataHoje = verificaData()
-    	#Se Mês for diferente de Março ou Ano diferente de 2022 // Fecha o Bot
-		if(dataHoje[1] != 3 or dataHoje[2] != 2022):
-			exit()
-
 		#Inicia Analise/Aposta do Bot
 		if verificarTempo() == 59:
 			if type(tendencia) == bool:
@@ -83,7 +69,7 @@ def main():
 
 
 def analisarTendencia():
-	global tendencia, contadorVelasTendencia, contadorTrocaTendencia
+	global tendencia, contadorVelasTendencia, contadorTrocaTendencia, ultimaTendencia
 	print("Buscando a tendencia.....")
 	for i in range(coordQuadradoTendencia[0], 0, -50):
 		if pyautogui.pixelMatchesColor(i, coordQuadradoTendencia[1], (corQuadradoVermelho), tolerance=10): #Tendencia Baixa // quadrado vermelho
@@ -100,7 +86,6 @@ def analisarTendencia():
 			contadorVelasTendencia = 0
 			print("Tendencia de ALTA!")
 			break
-
 
 def balance():
 	wallet = driver.find_element(By.CSS_SELECTOR, ".group-wallet .wallet").text
@@ -126,6 +111,9 @@ def verificarWinLoss():
 				print('loss tendencia alta / vela anterior verde')
 				loss += 1
 				galeAtual += 1
+				if galeAtual > maxGale:
+					print('estourou o limite de gales // voltando para a entrada inicial')
+					galeAtual = 0
 				break
 		if pyautogui.pixelMatchesColor(velaAnterior[0], i, (corVelaVerde), tolerance=10): #Vela Verde
 			if tendencia == True:
@@ -137,6 +125,9 @@ def verificarWinLoss():
 				print('loss tendencia alta / vela anterior vermelha')
 				loss += 1
 				galeAtual += 1
+				if galeAtual > maxGale:
+					print('estourou o limite de gales // voltando para a entrada inicial')
+					galeAtual = 0
 				break
 
 def resultadoBancoDados():
@@ -221,5 +212,4 @@ def verificarTempo():
 ######   INICIAR BOT    ######
 ##############################
 sleep(3)
-#main()
-analisarTendencia()
+main()
