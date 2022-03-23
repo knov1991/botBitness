@@ -1,13 +1,13 @@
-from selenium.webdriver.common.by import By
-from selenium import webdriver
-import pyautogui
-from time import sleep
-import keyboard
-from datetime import datetime, date
+from tkinter import *
 from jinja2 import Undefined
-import os.path
+import pyautogui
+import keyboard
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from time import sleep
+from datetime import datetime, date
 import csv
-
+import os.path
 
 ##############################
 #######   VARIÁVEIS    #######
@@ -28,6 +28,7 @@ coordQuadradoTendencia = (683, 753)
 corQuadradoVermelho = (255, 0, 0)
 corQuadradoAmarelo = (255, 229, 0)
 tendencia = Undefined
+ultimaTendencia = Undefined
 #Win / Loss / contador de gale / contador de velas para trocar tendencia
 contadorVelasTendencia = 0
 contadorTrocaTendencia = 0
@@ -43,6 +44,43 @@ for i in range(maxGale+1): #maxGale + entrada inicial
 	contadorGales.append(0)
 
 
+######################################
+#####   INTERFACE INICIALIZAR    #####
+######################################
+def startBot():
+	global travaTrocaTendencia
+	travaTrocaTendencia = int(campoTrava.get())
+	if travaTrocaTendencia < 2:
+		return
+	
+	campoTrava.config(state='disabled')
+	app.after(5000, lambda: app.destroy())
+
+#cores
+corFundo = '#dde'
+corTexto = '#c0c'
+corAlerta = '#f00'
+corInfo = '#070'
+#interface
+app=Tk()
+app.title('Robô 720!')
+app.geometry('300x200')
+app.resizable(False,False)
+app.configure(background=corFundo)
+
+#Campo para inserir a quantidade de velas da trava de troca de tendencia
+Label(app,text='Velas-Trava',background=corFundo,foreground=corTexto,anchor=W).place(x=120,y=30,width=80,height=20)
+campoTrava=Entry(app)
+campoTrava.place(x=130,y=50,width=50,height=20)
+
+#botao para iniciar o BOT
+btnIniciar = Button(app,text='INICIAR BOT',command=lambda: [startBot()])
+#btnIniciar.pack(ipadx=30,ipady=10,expand=True)
+btnIniciar.place(x=50,y=100,width=200,height=60)
+#IniciarInterface
+app.mainloop()
+
+
 ##############################
 #####   GOOGLE CHROME    #####
 ##############################
@@ -54,8 +92,22 @@ driver = webdriver.Chrome(options=options)
 ##############################
 ########   FUNÇÕES    ########
 ##############################
+#Pegar dia/mes/ano
+def verificaData():
+    hoje = date.today()
+    dia = hoje.day
+    mes = hoje.month
+    ano = hoje.year
+    return [dia,mes,ano]
+
 def main():
 	while True:
+		#TRAVAR O BOT APOS DATA LIMITE
+		dataHoje = verificaData()
+    	#Se Mês for diferente de Março ou Ano diferente de 2022 // Fecha o Bot
+		if(dataHoje[1] != 3 or dataHoje[2] != 2022):
+			exit()
+
 		#Inicia Analise/Aposta do Bot
 		if verificarTempo() == 59:
 			if type(tendencia) == bool:
@@ -76,6 +128,7 @@ def analisarTendencia():
 			if tendencia == True:
 				contadorTrocaTendencia += 1
 			tendencia = False
+			ultimaTendencia = False
 			contadorVelasTendencia = 0
 			print("Tendencia de BAIXA!")
 			break
@@ -83,9 +136,20 @@ def analisarTendencia():
 			if tendencia == False:
 				contadorTrocaTendencia += 1
 			tendencia = True
+			ultimaTendencia = True
 			contadorVelasTendencia = 0
 			print("Tendencia de ALTA!")
 			break
+	#Se não achar nenhum quadrado e tiver passado da trava de tendencia, alterar para a ultima tendencia encontrada e salva
+	if contadorVelasTendencia >= travaTrocaTendencia:
+		tendencia = ultimaTendencia
+		contadorTrocaTendencia += 1
+		contadorVelasTendencia = 0
+		print('Tendencia não encontrada!')
+		if ultimaTendencia == False:
+			print("Trocando para a ultima tendencia, BAIXA!")
+		if ultimaTendencia == True:
+			print("Trocando para a ultima tendencia, ALTA!")
 
 def balance():
 	wallet = driver.find_element(By.CSS_SELECTOR, ".group-wallet .wallet").text
@@ -205,7 +269,6 @@ def verificarTempo():
 		return int(segundos)
 	except:
 		return 0
-
 
 
 ##############################
