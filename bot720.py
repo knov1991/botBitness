@@ -54,6 +54,7 @@ def startBot():
 		return
 	
 	campoTrava.config(state='disabled')
+	btnIniciar.config(state='disabled')
 	app.after(5000, lambda: app.destroy())
 
 #cores
@@ -69,14 +70,14 @@ app.resizable(False,False)
 app.configure(background=corFundo)
 
 #Campo para inserir a quantidade de velas da trava de troca de tendencia
-Label(app,text='Velas-Trava',background=corFundo,foreground=corTexto,anchor=W).place(x=120,y=30,width=80,height=20)
+Label(app,text='Velas-Trava-Tendencia',background=corFundo,foreground=corTexto,anchor=W).place(x=90,y=30,width=130,height=20)
 campoTrava=Entry(app)
 campoTrava.place(x=130,y=50,width=50,height=20)
 
 #botao para iniciar o BOT
 btnIniciar = Button(app,text='INICIAR BOT',command=lambda: [startBot()])
-#btnIniciar.pack(ipadx=30,ipady=10,expand=True)
 btnIniciar.place(x=50,y=100,width=200,height=60)
+
 #IniciarInterface
 app.mainloop()
 
@@ -109,7 +110,8 @@ def main():
 			exit()
 
 		#Inicia Analise/Aposta do Bot
-		if verificarTempo() == 59:
+		tempo = verificarTempo()
+		if tempo > 55 and tempo < 60:
 			if type(tendencia) == bool:
 				verificarWinLoss()
 				resultadoBancoDados()

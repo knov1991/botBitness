@@ -7,7 +7,7 @@ def conexaoBanco():
     HOST='turimdb.cqvpghqsplex.us-east-2.rds.amazonaws.com'
     DB='bitness'
     USER='admin'
-    PASSWORD='turim972468'
+    PASSWORD=''
 
     """ HOST='localhost'
     DB='bitness'
